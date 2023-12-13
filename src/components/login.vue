@@ -1,4 +1,5 @@
 <script setup>
+    import axios from '../api/axios.js';
     import { ref, reactive, unref } from 'vue'
     const params = reactive({
         verify: { key: null }
@@ -21,8 +22,19 @@
 
     const onlogin = async() =>{
         const form = unref(logindata);
-        
-        console.log(user.uname+user.upassword)
+        axios({
+            method:'post',
+            url:'/login',
+            params:{
+                sid: user.uname,
+                spassword: user.upassword
+            }
+        }).then(function (response) {
+            console.log(response);
+        }).catch(function (error) {
+            console.log(error);
+        });
+
     }
 
 </script>
