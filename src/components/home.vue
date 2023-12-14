@@ -4,16 +4,15 @@ import loginSVG from "@/assets/login.svg"
 import router from '../router';
 
 //用户名
-var userName;
+var userName = '请登录';
 //状态码
 var number;
 /**
  * 检测用户是否登录
  */
-function onIsLogin(){
-    return userName,number;
-}
-
+onMounted(()=>{
+    console.log(query)
+})
 /**
  * 跳转到登录页
  */
@@ -26,7 +25,7 @@ function toLogin(){
 
 <template>
     <div class="header">
-        <a href="https://tfswufe.edu.cn/"><img src="../assets//logo.png" alt="logo.png" class="logo"></a>
+        <a href="https://tfswufe.edu.cn/"><img src="../assets//logo.png" alt="logo.png" class="homelogo"></a>
         <div class="login" v-on:mousedown="toLogin()">
             <img src="../assets/login.svg" class="loginsvg">
             {{ userName }}
@@ -40,9 +39,10 @@ function toLogin(){
     border-bottom: 1px solid rgb(203, 201, 201);
 }
 
-.logo {
+.homelogo {
     margin-left: 10%;
     width: 150px;
+    height: 50px;
 }
 
 .login {
@@ -56,7 +56,6 @@ function toLogin(){
     cursor: pointer;
 }
 .loginsvg {
-    margin-top: 13px;
     margin-left: 10%;
     width: 30px;
 }
