@@ -1,6 +1,8 @@
 <script setup>
 import { ref, reactive, getCurrentInstance } from 'vue'
 import router from '../router';
+import  usestudentStore  from "../stores/usestudentStore"
+// axios全局调用配置
 const currentInstance = getCurrentInstance();
 const { $http } = currentInstance.appContext.config.globalProperties;
 const { proxy } = currentInstance;
@@ -12,26 +14,40 @@ const user = reactive({
     upassword: ''
 })
 
+/**
+ * 登录方法 登录时判断用户是否登录
+ * 登录->前往用户信息 未登录->前往登录
+ */
 const onlogin = async () => {
+    // 使用URLSearchParams()进行post请求传参
     let pram = new URLSearchParams();
     pram.append("sid", user.uname);
     pram.append("spassword", user.upassword);
-    proxy.$http.post("/api/login", pram).then((res) => {
+    proxy.$http.post("/api/slogin", pram).then((res) => {
         if (res.data != "") {
             ElMessage({
                 message: '登录成功！',
                 type: 'success',
             })
-            router.push({
-                name:'/',
-                parma:res.data
-            })
+            const store = usestudentStore();
+            store.studentMsg = res.data
+            router.push('/')
         } else {
             ElMessage.error('账号或密码错误');
             user.upassword= '';
         }
     })
 }
+
+/**
+ * 监听键盘enter事件
+ */
+document.addEventListener('keydown', (e) => {
+	let key = window.event.keyCode;
+    if (key == 13) {
+        onlogin();
+	}
+})
 
 </script>
 

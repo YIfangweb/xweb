@@ -2,23 +2,32 @@ import loginSVG from "@/assets/login.svg"
 
 <script setup>
 import router from '../router';
+import  usestudentStore  from "../stores/usestudentStore"
 
-//用户名
-var userName = '请登录';
-//状态码
-var number;
+// 取出pinia存储的数据
+const store = usestudentStore();
+console.log(store.studentMsg)
+
+var userName = '请登录'; 
+
+if(typeof(store.studentMsg) != "undefined" ){
+    userName = store.studentMsg.sname;
+}
+console.log(Cookies.get('studentinfo'))
 /**
- * 检测用户是否登录
- */
-onMounted(()=>{
-    console.log(query)
-})
-/**
- * 跳转到登录页
+ * 跳转到登录页或者用户信息页
  */
 function toLogin(){
-    router.push('/login')
-    console.log('from home to login')
+    let u = userName
+    console.log(u)
+    if(u == '请登录'){
+        router.push('/login')  
+    }
+    if(typeof(u) != 'undefined' && u != '请登录'){
+        router.push('/userInfo')
+    }else{
+        router.push('/login')
+    }
 }
 
 </script>
@@ -26,7 +35,7 @@ function toLogin(){
 <template>
     <div class="header">
         <a href="https://tfswufe.edu.cn/"><img src="../assets//logo.png" alt="logo.png" class="homelogo"></a>
-        <div class="login" v-on:mousedown="toLogin()">
+        <div class="login"  v-on:mousedown="toLogin()">
             <img src="../assets/login.svg" class="loginsvg">
             {{ userName }}
         </div>
@@ -57,6 +66,7 @@ function toLogin(){
 }
 .loginsvg {
     margin-left: 10%;
+    margin-top: 15%;
     width: 30px;
 }
 </style>
