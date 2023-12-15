@@ -89,6 +89,7 @@ const onyanzheng=()=>{
 const changeMsg = ref('您是老师？点我登录')
 const changeNum = ref(0)
 const tCss = reactive({left : "calc(50% - 2px)"})
+const imgUrl = reactive({Purl:'./src/assets/s.png'})
 /**
  * 切换登录
  */
@@ -97,12 +98,14 @@ const onchangeMsg=()=>{
     changeMsg.value = '您是学生？点我登录'
     changeNum.value = 1
     tCss.left = "0"
+    imgUrl.Purl = './src/assets/t.png'
     return;
   }
   if(changeNum.value === 1){
     changeMsg.value = '您是老师？点我登录'
     changeNum.value = 0
     tCss.left = "calc(50% - 2px)"
+    imgUrl.Purl = './src/assets/s.png'
   }
 }
 
@@ -147,7 +150,8 @@ const onchangeMsg=()=>{
           </el-form>
         </div>
         <div class="titlebox">
-            <el-button @click="onchangeMsg()">{{ changeMsg }}</el-button>
+            <img v-bind:src="imgUrl.Purl" class="Login-img">
+            <el-button @click="onchangeMsg()" class="changeBtn">{{ changeMsg }}</el-button>
         </div>
     </div>
 </template>
@@ -210,18 +214,26 @@ const onchangeMsg=()=>{
     border-radius: 15px;
 }
 .titlebox{
-  width: calc(50% + 2px);
+  width: calc(50% + 4px);
   height: 500px;
   background-color: #ffa7a7;
   position: relative;
   top: calc(-100% - 25px);
   left: v-bind('tCss.left');
   border-radius: 15px;
+  transition: all 0.25s linear 0s;
+  text-align: center;
 }
 .yanzheng{
   width: 60%;
   height: 35px;
   margin-top: 5%;
   margin-left: 20%;
+}
+.Login-img{
+  width: 100%;
+}
+.changeBtn{
+
 }
 </style>
