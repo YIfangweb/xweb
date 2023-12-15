@@ -2,8 +2,7 @@ import loginSVG from "@/assets/login.svg"
 
 <script setup>
 import router from '../router';
-
-
+import  {ref} from "vue";
 
 // 取出pinia存储的数据
 
@@ -14,7 +13,7 @@ var userName = ref('请登录');
  * 跳转到登录页或者用户信息页
  */
 function toLogin(){
-    let u = userName
+    let u = userName.value
     if(u == '请登录'){
         router.push('/login')  
     }
