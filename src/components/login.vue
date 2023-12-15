@@ -34,6 +34,7 @@ const onslogin = async () => {
     let spram = new URLSearchParams();
     spram.append("sid", user.uname);
     spram.append("spassword", user.upassword);
+  console.log(spram+'1')
     proxy.$http.post("/api/slogin", spram).then((res) => {
         if (res.data != "") {
             ElMessage({
@@ -59,6 +60,7 @@ const ontlogin = async () => {
   let tpram = new URLSearchParams();
   tpram.append("tid", tuser.tuname);
   tpram.append("tpassword", tuser.tupassword);
+  console.log(tpram+'2')
   proxy.$http.post("/api/tlogin", tpram).then((res) => {
     console.log(res.data)
     if (res.data != "") {
@@ -76,7 +78,6 @@ const ontlogin = async () => {
   })
 }
 const YZmsg = ref('点击进行验证')
-
 
 /**
  * 验证是否是人机
@@ -134,12 +135,12 @@ const onchangeMsg=()=>{
         <div class="tloginbox">
           <img src="../assets/logo.png" class="loginlogo">
           <p class="wc">欢迎回来</p>
-          <el-form :model="tuser" ref="slogindata">
+          <el-form :model="tuser" ref="tlogindata">
             <el-form-item prop="tuname">
               <el-input v-model="tuser.tuname" placeholder="请输入您的工号" clearable class="un" />
             </el-form-item>
             <el-form-item prop="tupassword">
-              <el-input v-model="tuser.tpassword" placeholder="请输入您的密码" show-password class="up" />
+              <el-input v-model="tuser.tupassword" placeholder="请输入您的密码" show-password class="up" />
             </el-form-item>
             <el-form-item>
               <el-button class="yanzheng" plain @click="onyanzheng()">{{ YZmsg }}</el-button>
@@ -216,7 +217,7 @@ const onchangeMsg=()=>{
 .titlebox{
   width: calc(50% + 4px);
   height: 500px;
-  background-color: #ffa7a7;
+  background: #dcf9fc url('../assets/Login-Background.svg') no-repeat left bottom;
   position: relative;
   top: calc(-100% - 25px);
   left: v-bind('tCss.left');

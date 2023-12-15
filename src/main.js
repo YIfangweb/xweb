@@ -12,7 +12,7 @@ const pinia = createPinia()
 const app =  createApp(App);
 
 // 配置axios请求地址并暴露为全局变量
-axios.defaults.baseURL = 'http://localhost:1314',
+axios.defaults.baseURL = 'http://localhost:1314'
 app.config.globalProperties.$http=axios
 
 app.use(router)

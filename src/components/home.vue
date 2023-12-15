@@ -2,16 +2,14 @@ import loginSVG from "@/assets/login.svg"
 
 <script setup>
 import router from '../router';
-import  usestudentStore  from "../stores/usestudentStore"
+
+
 
 // 取出pinia存储的数据
-const store = usestudentStore();
 
-var userName = '请登录'; 
+var userName = ref('请登录');
 
-if(typeof(store.studentMsg) != "undefined" ){
-    userName = store.studentMsg.sname;
-}
+
 /**
  * 跳转到登录页或者用户信息页
  */
