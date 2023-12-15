@@ -2,28 +2,39 @@
 import { ref, reactive, getCurrentInstance } from 'vue'
 import router from '../router';
 import  usestudentStore  from "../stores/usestudentStore"
+import useteacherStore from "../stores/useteacherStore.js";
+
 // axios全局调用配置
 const currentInstance = getCurrentInstance();
 const { $http } = currentInstance.appContext.config.globalProperties;
 const { proxy } = currentInstance;
 
-const logindata = ref(null);
+//学生默认数据
+const slogindata = ref(null);
 
 const user = reactive({
     uname: '',
     upassword: ''
 })
 
+//老师默认数据
+const tlogindata = ref(null);
+
+const tuser = reactive({
+  tuname: '',
+  tupassword: ''
+})
+
 /**
- * 登录方法 登录时判断用户是否登录
+ * 学生登录方法 登录时判断用户是否登录
  * 登录->前往用户信息 未登录->前往登录
  */
-const onlogin = async () => {
+const onslogin = async () => {
     // 使用URLSearchParams()进行post请求传参
-    let pram = new URLSearchParams();
-    pram.append("sid", user.uname);
-    pram.append("spassword", user.upassword);
-    proxy.$http.post("/api/slogin", pram).then((res) => {
+    let spram = new URLSearchParams();
+    spram.append("sid", user.uname);
+    spram.append("spassword", user.upassword);
+    proxy.$http.post("/api/slogin", spram).then((res) => {
         if (res.data != "") {
             ElMessage({
                 message: '登录成功！',
@@ -40,40 +51,103 @@ const onlogin = async () => {
 }
 
 /**
- * 监听键盘enter事件
+ * 教师登录方法 登录时判断用户是否登录
+ * 登录->前往用户信息 未登录->前往登录
  */
-document.addEventListener('keydown', (e) => {
-	let key = window.event.keyCode;
-    if (key == 13) {
-        onlogin();
-	}
-})
+const ontlogin = async () => {
+  // 使用URLSearchParams()进行post请求传参
+  let tpram = new URLSearchParams();
+  tpram.append("tid", tuser.tuname);
+  tpram.append("tpassword", tuser.tupassword);
+  proxy.$http.post("/api/tlogin", tpram).then((res) => {
+    console.log(res.data)
+    if (res.data != "") {
+      ElMessage({
+        message: '登录成功！',
+        type: 'success',
+      })
+      const store = useteacherStore();
+      store.teacherMsg = res.data
+      router.push('/')
+    } else {
+      ElMessage.error('账号或密码错误');
+      tuser.tupassword= '';
+    }
+  })
+}
+const YZmsg = ref('点击进行验证')
+
+
+/**
+ * 验证是否是人机
+ */
+const onyanzheng=()=>{
+  YZmsg.value = '验证通过√'
+}
+
+
+const changeMsg = ref('您是老师？点我登录')
+const changeNum = ref(0)
+const tCss = reactive({left : "calc(50% - 2px)"})
+/**
+ * 切换登录
+ */
+const onchangeMsg=()=>{
+  if(changeNum.value === 0){
+    changeMsg.value = '您是学生？点我登录'
+    changeNum.value = 1
+    tCss.left = "0"
+    return;
+  }
+  if(changeNum.value === 1){
+    changeMsg.value = '您是老师？点我登录'
+    changeNum.value = 0
+    tCss.left = "calc(50% - 2px)"
+  }
+}
 
 </script>
 
 <template>
     <div class="bodybox">
-        <div class="loginbox">
+        <div class="sloginbox">
             <img src="../assets/logo.png" class="loginlogo">
             <p class="wc">欢迎回来</p>
-            <el-form :model="user" ref="logindata">
+            <el-form :model="user" ref="slogindata">
                 <el-form-item prop="uname">
-                    <el-input v-model="user.uname" placeholder="请输入您的账号" clearable class="un" />
+                    <el-input v-model="user.uname" placeholder="请输入您的学号" clearable class="un" />
                 </el-form-item>
                 <el-form-item prop="upassword">
                     <el-input v-model="user.upassword" placeholder="请输入您的密码" show-password class="up" />
                 </el-form-item>
                 <el-form-item>
-                    <el-button class="sub" type="primary" @click="onlogin()">登录</el-button>
+                    <el-button class="yanzheng" plain @click="onyanzheng()">{{ YZmsg }}</el-button>
                 </el-form-item>
+              <el-form-item>
+                <el-button class="sub" type="primary" @click="onslogin()">登录</el-button>
+              </el-form-item>
             </el-form>
-
         </div>
-        <div class="signinbox">
-
+        <div class="tloginbox">
+          <img src="../assets/logo.png" class="loginlogo">
+          <p class="wc">欢迎回来</p>
+          <el-form :model="tuser" ref="slogindata">
+            <el-form-item prop="tuname">
+              <el-input v-model="tuser.tuname" placeholder="请输入您的工号" clearable class="un" />
+            </el-form-item>
+            <el-form-item prop="tupassword">
+              <el-input v-model="tuser.tpassword" placeholder="请输入您的密码" show-password class="up" />
+            </el-form-item>
+            <el-form-item>
+              <el-button class="yanzheng" plain @click="onyanzheng()">{{ YZmsg }}</el-button>
+            </el-form-item>
+            <el-form-item>
+              <el-button class="sub" type="primary" @click="ontlogin()">登录</el-button>
+            </el-form-item>
+          </el-form>
         </div>
         <div class="titlebox">
-
+            <el-button @click="onchangeMsg()">{{ changeMsg }}</el-button>
         </div>
     </div>
 </template>
@@ -86,7 +160,7 @@ document.addEventListener('keydown', (e) => {
     height: 450px;
 }
 
-.loginbox {
+.sloginbox {
     float: left;
     width: 50%;
     height: 450px;
@@ -126,10 +200,28 @@ document.addEventListener('keydown', (e) => {
     margin-left: 20%;
 }
 
-.signinbox {
+.tloginbox {
     width: 50%;
     height: 450px;
-    background-color: #6d1e1e;
+    background-color: #ffffff;
     margin-left: 50%;
+    text-align: center;
+    border: 1px solid rgb(197, 197, 197);
+    border-radius: 15px;
+}
+.titlebox{
+  width: calc(50% + 2px);
+  height: 500px;
+  background-color: #ffa7a7;
+  position: relative;
+  top: calc(-100% - 25px);
+  left: v-bind('tCss.left');
+  border-radius: 15px;
+}
+.yanzheng{
+  width: 60%;
+  height: 35px;
+  margin-top: 5%;
+  margin-left: 20%;
 }
 </style>

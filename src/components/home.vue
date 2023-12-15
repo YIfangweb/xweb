@@ -6,20 +6,17 @@ import  usestudentStore  from "../stores/usestudentStore"
 
 // 取出pinia存储的数据
 const store = usestudentStore();
-console.log(store.studentMsg)
 
 var userName = '请登录'; 
 
 if(typeof(store.studentMsg) != "undefined" ){
     userName = store.studentMsg.sname;
 }
-console.log(Cookies.get('studentinfo'))
 /**
  * 跳转到登录页或者用户信息页
  */
 function toLogin(){
     let u = userName
-    console.log(u)
     if(u == '请登录'){
         router.push('/login')  
     }
