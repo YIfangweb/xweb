@@ -25,10 +25,10 @@ onMounted( ()=>{
  */
 const toLogin=()=>{
     let u = userName.value
-    if(u == '请登录'){
+    if(u === '请登录'){
         router.push('/login')  
     }
-    if(typeof(u) != 'undefined' && u != '请登录'){
+    if(typeof(u) != 'undefined' && u !== '请登录'){
         router.push('/userInfo')
     }else{
         router.push('/login')
