@@ -1,11 +1,13 @@
 import { defineStore } from 'pinia'
 
-const usestudentStore = defineStore('student', {
-    state: () => {
-        studentMsg:{}
+let usestudentStore;
+export default  usestudentStore = defineStore('student', {
+    state : ()=>{
+        return {
+            studentMsg:{}
+        }
     },
     getters: {},
-    actions: {}
+    actions: {},
+    persist : true
 })
-
-export default usestudentStore

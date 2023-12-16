@@ -5,9 +5,12 @@ import './style.css'
 import router from './router';
 import App from './App.vue'
 import axios from 'axios';
-
+import { createPersistedState} from 'pinia-plugin-persistedstate'
 
 const pinia = createPinia()
+pinia.use(createPersistedState({
+    storage: sessionStorage
+}))
 
 const app =  createApp(App);
 

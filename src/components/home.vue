@@ -2,17 +2,28 @@ import loginSVG from "@/assets/login.svg"
 
 <script setup>
 import router from '../router';
-import  {ref} from "vue";
+import  {ref ,onMounted ,toRaw} from "vue";
+import usestudentStore from "../stores/usestudentStore.js";
+import useteacherStore from "../stores/useteacherStore.js";
+
 
 // 取出pinia存储的数据
 
-var userName = ref('请登录');
+var userName = ref('');
 
-
+onMounted( ()=>{
+  if (Object.keys(usestudentStore().studentMsg).length !== 0){
+      userName.value = usestudentStore().studentMsg.sname
+  }else if(Object.keys(usestudentStore().studentMsg).length !== 0){
+      userName.value = useteacherStore().teacherMsg.tname
+  }else {
+      userName.value = '请登录'
+  }
+})
 /**
  * 跳转到登录页或者用户信息页
  */
-function toLogin(){
+const toLogin=()=>{
     let u = userName.value
     if(u == '请登录'){
         router.push('/login')  
@@ -23,6 +34,7 @@ function toLogin(){
         router.push('/login')
     }
 }
+
 
 </script>
 

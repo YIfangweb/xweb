@@ -2,7 +2,7 @@
 import { ref, reactive, getCurrentInstance } from 'vue'
 import router from '../router';
 import  usestudentStore  from "../stores/usestudentStore"
-import useteacherStore from "../stores/useteacherStore.js";
+import  useteacherStore from "../stores/useteacherStore"
 
 // axios全局调用配置
 const currentInstance = getCurrentInstance();
@@ -34,9 +34,8 @@ const onslogin = async () => {
     let spram = new URLSearchParams();
     spram.append("sid", user.uname);
     spram.append("spassword", user.upassword);
-  console.log(spram+'1')
     proxy.$http.post("/api/slogin", spram).then((res) => {
-        if (res.data != "") {
+        if (res.data !== "") {
             ElMessage({
                 message: '登录成功！',
                 type: 'success',
@@ -60,10 +59,8 @@ const ontlogin = async () => {
   let tpram = new URLSearchParams();
   tpram.append("tid", tuser.tuname);
   tpram.append("tpassword", tuser.tupassword);
-  console.log(tpram+'2')
   proxy.$http.post("/api/tlogin", tpram).then((res) => {
-    console.log(res.data)
-    if (res.data != "") {
+    if (res.data !== "") {
       ElMessage({
         message: '登录成功！',
         type: 'success',
@@ -91,6 +88,7 @@ const changeMsg = ref('您是老师？点我登录')
 const changeNum = ref(0)
 const tCss = reactive({left : "calc(50% - 2px)"})
 const imgUrl = reactive({Purl:'./src/assets/s.png'})
+
 /**
  * 切换登录
  */
