@@ -108,6 +108,97 @@ const onchangeMsg=()=>{
   }
 }
 
+//设置注册用户类型
+
+const userType = ref('')
+const options = [
+  {
+    value: '学生',
+    lable:'学生'
+  },
+  {
+    value: '教师',
+    lable:'教师'
+  }
+]
+
+//设置弹出框状态dialogVisible
+const dialogVisible = ref(false);
+
+const openDislog=()=>{
+  dialogVisible.value = true
+}
+
+const handleClose = () =>{
+  ElMessageBox.confirm('确定关闭吗？')
+      .then(() => {
+        dialogVisible.value = false
+      })
+      .catch(() => {
+        // catch error
+      })
+}
+
+
+//学生注册模型
+const studentSignin = reactive({
+  sname:'',
+  spassword:'',
+  sclass:'',
+  syear:''
+})
+const studentSignindata = ref(null);
+
+//教师注册模型
+const teacherSignin = reactive({
+  tname:'',
+  tpassword:''
+})
+
+const teacherSignindata = ref(null);
+
+const onsSignIn = () =>{
+  let spram = new URLSearchParams();
+  spram.append("sname", studentSignin.sname);
+  spram.append("spassword", studentSignin.spassword);
+  spram.append("sclass", studentSignin.sclass);
+  spram.append("syear", studentSignin.syear);
+  proxy.$http.post("/api/onsSignIn", spram).then((res) => {
+    if (res.data.msg === "success") {
+      ElMessage({
+        message: '注册成功！',
+        type: 'success',
+      })
+      studentSignin.sname = ''
+      studentSignin.spassword = ''
+      studentSignin.sclass = ''
+      studentSignin.syear = ''
+      alert('您的账号为：'+'['+res.data.object.sid+']|使用账号+密码登录')
+    }else if(res.data.msg === "error"){
+      ElMessage.error('未知错误，请联系管理员');
+    }
+  })
+}
+
+const ontSignIn = () =>{
+  let tpram = new URLSearchParams();
+  tpram.append("tname", teacherSignin.tname);
+  tpram.append("tpassword", teacherSignin.tpassword);
+  proxy.$http.post("/api/ontSignIn", tpram).then((res) => {
+    if (res.data.msg === "success") {
+      ElMessage({
+        message: '注册成功！',
+        type: 'success',
+      })
+      teacherSignin.tname = ''
+      teacherSignin.tpassword = ''
+      alert('您的账号为：'+'['+res.data.object.tid+']|使用账号+密码登录')
+    }else if(res.data.msg === "error"){
+      ElMessage.error('未知错误，请联系管理员');
+    }
+  })
+}
+
 </script>
 
 <template>
@@ -151,8 +242,61 @@ const onchangeMsg=()=>{
         <div class="titlebox">
             <img v-bind:src="imgUrl.Purl" class="Login-img">
             <el-button @click="onchangeMsg()" class="changeBtn">{{ changeMsg }}</el-button>
+            <el-button @click="openDislog()" class="signIn">还没有账号，点击注册</el-button>
         </div>
     </div>
+  <div class="signIn">
+    <el-dialog
+        v-model="dialogVisible"
+        title="注册账号"
+        width="50%"
+        :before-close="handleClose"
+    >
+      请选择您要注册的用户类型
+      <el-select v-model="userType" class="m-2" placeholder="请选择您要注册的用户类型">
+        <el-option
+            v-for="item in options"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+        />
+      </el-select>
+      <el-form :model="studentSignin" ref="studentSignindata" v-if="userType === '学生'">
+        <el-form-item prop="sname">
+          姓名
+          <el-input v-model="studentSignin.sname" placeholder="请输入您的姓名" clearable class="un" />
+        </el-form-item>
+        <el-form-item prop="spassword">
+          密码
+          <el-input v-model="studentSignin.spassword" placeholder="请输入您的密码" show-password class="up" />
+        </el-form-item>
+        <el-form-item prop="sclass">
+          班级
+          <el-input v-model="studentSignin.sclass" placeholder="请输入您的班级"  class="un" />
+        </el-form-item>
+        <el-form-item prop="syear">
+          年级
+          <el-input v-model="studentSignin.syear" placeholder="请输入您的年级" class="up" />
+        </el-form-item>
+        <el-form-item>
+          <el-button class="sub" type="primary" @click="onsSignIn()">注册</el-button>
+        </el-form-item>
+      </el-form>
+      <el-form :model="teacherSignin" ref="teacherSignindata" v-if="userType === '教师'">
+        <el-form-item prop="tname">
+          姓名
+          <el-input v-model="teacherSignin.tname" placeholder="请输入您的姓名" clearable class="un" />
+        </el-form-item>
+        <el-form-item prop="tpassword">
+          密码
+          <el-input v-model="teacherSignin.tpassword" placeholder="请输入您的密码" show-password class="up" />
+        </el-form-item>
+        <el-form-item>
+          <el-button class="sub" type="primary" @click="ontSignIn()">注册</el-button>
+        </el-form-item>
+      </el-form>
+    </el-dialog>
+  </div>
 </template>
 
 <style>
@@ -232,7 +376,7 @@ const onchangeMsg=()=>{
 .Login-img{
   width: 100%;
 }
-.changeBtn{
-
+.signIn{
+  margin-top: 5%;
 }
 </style>

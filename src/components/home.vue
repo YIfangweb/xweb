@@ -14,7 +14,7 @@ var userName = ref('');
 onMounted( ()=>{
   if (Object.keys(usestudentStore().studentMsg).length !== 0){
       userName.value = usestudentStore().studentMsg.sname
-  }else if(Object.keys(usestudentStore().studentMsg).length !== 0){
+  }else if(Object.keys(useteacherStore().teacherMsg).length !== 0){
       userName.value = useteacherStore().teacherMsg.tname
   }else {
       userName.value = '请登录'
