@@ -19,3 +19,9 @@ html{
 a{
     text-decoration: none;
 }
+@font-face {
+    font-family: 'myFont';
+    src: url('src/assets/fonts/AlimamaFangYuanTiVF-Thin.ttf');
+    font-weight: normal;
+    font-style: normal;
+}

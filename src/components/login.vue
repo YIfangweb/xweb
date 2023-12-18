@@ -3,6 +3,7 @@ import { ref, reactive, getCurrentInstance } from 'vue'
 import router from '../router';
 import  usestudentStore  from "../stores/usestudentStore"
 import  useteacherStore from "../stores/useteacherStore"
+import useUserType from "../stores/useUserType.js";
 
 // axios全局调用配置
 const currentInstance = getCurrentInstance();
@@ -25,6 +26,10 @@ const tuser = reactive({
   tupassword: ''
 })
 
+//设置注册用户类型
+const userType = ref('')
+
+const userTypeStore = useUserType();
 /**
  * 学生登录方法 登录时判断用户是否登录
  * 登录->前往用户信息 未登录->前往登录
@@ -42,6 +47,7 @@ const onslogin = async () => {
             })
             const store = usestudentStore();
             store.studentMsg = res.data
+            userTypeStore.userType = '学生'
             router.push('/')
         } else {
             ElMessage.error('账号或密码错误');
@@ -67,6 +73,7 @@ const ontlogin = async () => {
       })
       const store = useteacherStore();
       store.teacherMsg = res.data
+      userTypeStore.userType = '教师'
       router.push('/')
     } else {
       ElMessage.error('账号或密码错误');
@@ -112,9 +119,7 @@ const onchangeMsg=()=>{
   }
 }
 
-//设置注册用户类型
 
-const userType = ref('')
 const options = [
   {
     value: '学生',
