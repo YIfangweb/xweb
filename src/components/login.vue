@@ -80,7 +80,11 @@ const YZmsg = ref('点击进行验证')
  * 验证是否是人机
  */
 const onyanzheng=()=>{
-  YZmsg.value = '验证通过√'
+  //添加定时器 结束后执行
+  YZmsg.value = '正在验证安全性'
+  setTimeout(()=>{
+    YZmsg.value = '验证通过√'
+  },1000)
 }
 
 
@@ -173,7 +177,7 @@ const onsSignIn = () =>{
       studentSignin.spassword = ''
       studentSignin.sclass = ''
       studentSignin.syear = ''
-      alert('您的账号为：'+'['+res.data.object.sid+']|使用账号+密码登录')
+      alert('您的账号为：'+'[-->'+res.data.object.sid+'<--]--使用账号+密码登录')
     }else if(res.data.msg === "error"){
       ElMessage.error('未知错误，请联系管理员');
     }
@@ -192,7 +196,7 @@ const ontSignIn = () =>{
       })
       teacherSignin.tname = ''
       teacherSignin.tpassword = ''
-      alert('您的账号为：'+'['+res.data.object.tid+']|使用账号+密码登录')
+      alert('您的账号为：'+'[-->'+res.data.object.tid+'<--]--使用账号+密码登录')
     }else if(res.data.msg === "error"){
       ElMessage.error('未知错误，请联系管理员');
     }

@@ -2,7 +2,7 @@ import loginSVG from "@/assets/login.svg"
 
 <script setup>
 import router from '../router';
-import  {ref ,onMounted ,toRaw} from "vue";
+import  {ref ,onMounted} from "vue";
 import usestudentStore from "../stores/usestudentStore.js";
 import useteacherStore from "../stores/useteacherStore.js";
 
@@ -42,7 +42,7 @@ const toLogin=()=>{
 <template>
     <div class="header">
         <a href="https://tfswufe.edu.cn/"><img src="../assets//logo.png" alt="logo.png" class="homelogo"></a>
-        <div class="login"  v-on:mousedown="toLogin()">
+        <div class="login"  @click="toLogin()">
             <img src="../assets/login.svg" class="loginsvg">
             {{ userName }}
         </div>
