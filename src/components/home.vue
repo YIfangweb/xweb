@@ -12,6 +12,7 @@ import useteacherStore from "../stores/useteacherStore.js";
 var userName = ref('');
 
 onMounted( ()=>{
+  // 判断用户是否登录
   if (Object.keys(usestudentStore().studentMsg).length !== 0){
       userName.value = usestudentStore().studentMsg.sname
   }else if(Object.keys(useteacherStore().teacherMsg).length !== 0){
