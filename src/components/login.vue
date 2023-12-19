@@ -134,12 +134,10 @@ const Toptions = [
   }
 ]
 
-const options = [
-  {
+const options = reactive([{
     value: '',
     lable:''
-  }
-]
+}])
 
 
 //设置弹出框状态dialogVisible
@@ -147,8 +145,15 @@ const dialogVisible = ref(false);
 
 const openDislog=()=>{
   dialogVisible.value = true
-  proxy.$http.get('/api/getClass').then((res)=>{
-    console.log(res.data)
+  proxy.$http.get('/api/getClassName').then((res)=>{
+      for (let i = 0; i < res.data.length; i++) {
+        options.push({
+          value: res.data[i].classname,
+          label: res.data[i].classname
+        })
+      }
+      //删除options中的第一个空数据
+      options.shift()
   })
 }
 
@@ -183,7 +188,7 @@ const onsSignIn = () =>{
   let spram = new URLSearchParams();
   spram.append("sname", studentSignin.sname);
   spram.append("spassword", studentSignin.spassword);
-  spram.append("sclassname", studentSignin.sclassname);
+  spram.append("sclassname", studentSigninclassData.value);
   proxy.$http.post("/api/onsSignIn", spram).then((res) => {
     if (res.data.msg === "success") {
       ElMessage({

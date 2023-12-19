@@ -1,45 +1,129 @@
 <script setup>
-import { ref } from 'vue'
+import {ref, onMounted, getCurrentInstance, reactive} from 'vue'
+
+
+const currentInstance = getCurrentInstance();
+const { $http } = currentInstance.appContext.config.globalProperties;
+const { proxy } = currentInstance;
 
 const searchValue = ref('')
 const search = () => {
     console.log(searchValue.value)
 }
+const writePaper = ref(false)
+
 //给写论文按钮绑定事件
 const addPaper = () => {
-    console.log('写论文')
+    writePaper.value = true
+}
+const drawerClose = () => {
+    //提示用户是否确认关闭
+    ElMessageBox.confirm('确认关闭吗？您的内容将会保存，不会清除', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+    }).then(() => {
+        writePaper.value = false
+    }).catch(() => {
+        ElMessage({
+            type: 'info',
+            message: '已取消关闭'
+        });
+    });
+}
+
+//论文信息
+const paperMsg = reactive({
+    ptitle: '',
+    pdata: ''
+})
+
+//upPaper函数，先弹出确认框，用户点击确认后将论文信息传给后端，后端返回1为交论文成功，返回0交论文失败，弹出信息提示用户并关闭弹出框
+const submitPaper = () => {
+    ElMessageBox.confirm('确认提交吗？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+    }).then(() => {
+        let pram = new URLSearchParams();
+        pram.append("ptitle", paperMsg.ptitle);
+        pram.append("pdata", paperMsg.pdata);
+        proxy.$http.post("/api/submitPaper", pram).then((res) => {
+            console.log(res.data)
+            if (res.data === 1) {
+                ElMessage({
+                    message: '提交成功！',
+                    type: 'success',
+                })
+                writePaper.value = false
+            } else {
+                ElMessage.error('提交失败');
+            }
+        })
+    }).catch(() => {
+        ElMessage({
+            type: 'info',
+            message: '已取消提交'
+        });
+    });
+}
+
+const uploadPaper = ref(false)
+
+const uploadpaperMsg = reactive({
+    ptitle: ''
+})
+
+const uploaddrawerClose = () => {
+    //提示用户是否确认关闭
+    ElMessageBox.confirm('确认关闭吗？文件将会保存，不会清除', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+    }).then(() => {
+        uploadPaper.value = false
+    }).catch(() => {
+        ElMessage({
+            type: 'info',
+            message: '已取消关闭'
+        });
+    });
 }
 //给交论文按钮绑定事件
 const upPaper = () => {
-    console.log('交论文')
+  uploadPaper.value = true
 }
 //论文列表数据
-const paperList = ref([
+const paperList = reactive([
     {
-        id: '1314520',
-        title: '关于大数据的研究1',
-        author: '高兴文',
-        teacher: '罗玲',
-        grade: '88',
-        status: '已批改'
-    },
-  {
-    id: '1314521',
-    title: '关于大数据的研究2',
-    author: '高兴文',
-    teacher: '罗玲',
-    grade: '88',
-    status: '已批改'
-  }
-  ,{
-    id: '1314522',
-    title: '关于大数据的研究3',
-    author: '高兴文',
-    teacher: '罗玲',
-    grade: '88',
-    status: '已批改'
-  }
+        id: '',
+        title: '',
+        author: '',
+        teacher: '',
+        grade: '',
+        status: ''
+    }
 ])
+
+//onMounted函数
+onMounted(() => {
+    //发送post请求获取论文列表数据
+  proxy.$http.get("/api/getPaperList").then((res) => {
+    for (let i = 0; i < res.data.length; i++) {
+      paperList.value.push({
+        id: res.data[i].pid,
+        title: res.data[i].ptitle,
+        author: res.data[i].sname,
+        teacher: res.data[i].tname,
+        grade: res.data[i].pgrade,
+        status: res.data[i].pstatus
+      })
+    }
+    //清除第一条数据
+    paperList.shift()
+  })
+})
+
 
 const currentRow = ref()
 const singleTableRef = ref()
@@ -130,6 +214,46 @@ const handleDelete = () => {
                 <el-button type="danger"  @click="handleDelete()">删除</el-button>
               </el-table-column>
           </el-table>
+        <el-drawer v-model="writePaper"
+                   :before-close="drawerClose"
+                   title="写论文"
+                    size="50%"
+                   :with-header="true">
+          <el-form :model="paperMsg" label-width="100" class="fromStyle">
+              <el-form-item label="论文题目">
+                  <el-input v-model="paperMsg.ptitle" placeholder="请输入论文题目"></el-input>
+              </el-form-item>
+              <el-form-item label="论文内容">
+                  <el-input v-model="paperMsg.pdata" type="textarea" :autosize="{ minRows: 20, maxRows: 50}" placeholder="请输入论文内容"></el-input>
+              </el-form-item>
+              <el-form-item>
+                  <el-button type="primary" @click="submitPaper()">提交</el-button>
+              </el-form-item>
+          </el-form>
+        </el-drawer>
+        <el-drawer v-model="uploadPaper"
+                   :before-close="uploaddrawerClose"
+                   title="交论文"
+                   size="50%"
+                   :with-header="true">
+          <el-form :model="uploadpaperMsg" label-width="100" class="fromStyle">
+            <el-form-item label="论文题目">
+              <el-input v-model="uploadpaperMsg.ptitle" placeholder="请输入论文题目"></el-input>
+            </el-form-item>
+            <el-form-item label="文件">
+              <el-upload
+                  class="upload-demo"
+                  drag
+                  accept="docx">
+                <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+                <div class="el-upload__tip" slot="tip">只能上传docx文件</div>
+              </el-upload>
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" @click="upPaper()">上传</el-button>
+            </el-form-item>
+          </el-form>
+        </el-drawer>
       </div>
   </div>
 </template>
@@ -168,5 +292,8 @@ const handleDelete = () => {
 .paperListTable {
     margin-top: 10px;
     margin-left: 5px;
+}
+.fromStyle{
+    width: 100%;
 }
 </style>

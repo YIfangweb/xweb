@@ -142,8 +142,8 @@ const changeSrc = (index)=>{
     <el-menu default-active="1" class="el-menu-vertical-demo" @select="handleSelect">
       <el-menu-item index="1"><img :src="paper.value" width="20" alt="" class="myimg">我的论文</el-menu-item>
       <el-menu-item index="2"><img :src="topic.value" width="20" alt="" class="myimg">我的课题</el-menu-item>
-      <el-menu-item index="3"><img :src="uinfo.value" width="20" alt="" class="myimg">我的班级</el-menu-item>
-      <el-menu-item index="4"><img :src="myclass.value" width="20" alt="" class="myimg">我的信息</el-menu-item>
+      <el-menu-item index="3"><img :src="uinfo.value" width="20" alt="" class="myimg">我的信息</el-menu-item>
+      <el-menu-item index="4"><img :src="myclass.value" width="20" alt="" class="myimg">我的班级</el-menu-item>
       <el-menu-item index="5" v-on:click="loginOut()"><img :src="out.value" width="20" alt="" class="myimg">退出登录</el-menu-item>
     </el-menu>
   </div>
