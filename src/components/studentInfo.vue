@@ -7,8 +7,7 @@ import router from "../router/index.js";
 const studentMsg = reactive({
   sname:'',
   spassword:'',
-  sclass:'',
-  syear:'',
+  sclassname:'',
   sid:'',
   sunique:''
 })
@@ -16,8 +15,7 @@ const studentMsg = reactive({
 onMounted(()=>{
   studentMsg.sname = usestudentStore().studentMsg.sname
   studentMsg.spassword = usestudentStore().studentMsg.spassword
-  studentMsg.sclass = usestudentStore().studentMsg.sclass
-  studentMsg.syear = usestudentStore().studentMsg.syear
+  studentMsg.sclassname = usestudentStore().studentMsg.sclassname
   studentMsg.sid = usestudentStore().studentMsg.sid
   studentMsg.sunique = usestudentStore().studentMsg.sunique
 })
@@ -71,11 +69,8 @@ const updateUser = () =>{
             <el-form-item label="学号">
                 <el-input v-model="studentMsg.sid" disabled></el-input>
             </el-form-item>
-            <el-form-item label="年级">
-              <el-input v-model="studentMsg.syear" disabled></el-input>
-            </el-form-item>
             <el-form-item label="班级">
-                <el-input v-model="studentMsg.sclass" disabled></el-input>
+                <el-input v-model="studentMsg.sclassname" disabled></el-input>
             </el-form-item>
             <el-form-item label="密码">
                 <el-input v-model="studentMsg.spassword" show-password></el-input>

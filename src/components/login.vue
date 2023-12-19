@@ -30,6 +30,9 @@ const tuser = reactive({
 const userType = ref('')
 
 const userTypeStore = useUserType();
+
+const studentSigninclassData = ref('')
+
 /**
  * 学生登录方法 登录时判断用户是否登录
  * 登录->前往用户信息 未登录->前往登录
@@ -40,13 +43,13 @@ const onslogin = async () => {
     spram.append("sid", user.uname);
     spram.append("spassword", user.upassword);
     proxy.$http.post("/api/slogin", spram).then((res) => {
-        if (res.data !== "") {
+        if (res.data.msg === "success") {
             ElMessage({
                 message: '登录成功！',
                 type: 'success',
             })
             const store = usestudentStore();
-            store.studentMsg = res.data
+            store.studentMsg = res.data.object
             userTypeStore.userType = '学生'
             router.push('/')
         } else {
@@ -66,13 +69,13 @@ const ontlogin = async () => {
   tpram.append("tid", tuser.tuname);
   tpram.append("tpassword", tuser.tupassword);
   proxy.$http.post("/api/tlogin", tpram).then((res) => {
-    if (res.data !== "") {
+    if (res.data.msg === "success") {
       ElMessage({
         message: '登录成功！',
         type: 'success',
       })
       const store = useteacherStore();
-      store.teacherMsg = res.data
+      store.teacherMsg = res.data.object
       userTypeStore.userType = '教师'
       router.push('/')
     } else {
@@ -120,7 +123,7 @@ const onchangeMsg=()=>{
 }
 
 
-const options = [
+const Toptions = [
   {
     value: '学生',
     lable:'学生'
@@ -131,11 +134,22 @@ const options = [
   }
 ]
 
+const options = [
+  {
+    value: '',
+    lable:''
+  }
+]
+
+
 //设置弹出框状态dialogVisible
 const dialogVisible = ref(false);
 
 const openDislog=()=>{
   dialogVisible.value = true
+  proxy.$http.get('/api/getClass').then((res)=>{
+    console.log(res.data)
+  })
 }
 
 const handleClose = () =>{
@@ -153,8 +167,7 @@ const handleClose = () =>{
 const studentSignin = reactive({
   sname:'',
   spassword:'',
-  sclass:'',
-  syear:''
+  sclassname:''
 })
 const studentSignindata = ref(null);
 
@@ -170,8 +183,7 @@ const onsSignIn = () =>{
   let spram = new URLSearchParams();
   spram.append("sname", studentSignin.sname);
   spram.append("spassword", studentSignin.spassword);
-  spram.append("sclass", studentSignin.sclass);
-  spram.append("syear", studentSignin.syear);
+  spram.append("sclassname", studentSignin.sclassname);
   proxy.$http.post("/api/onsSignIn", spram).then((res) => {
     if (res.data.msg === "success") {
       ElMessage({
@@ -180,9 +192,9 @@ const onsSignIn = () =>{
       })
       studentSignin.sname = ''
       studentSignin.spassword = ''
-      studentSignin.sclass = ''
-      studentSignin.syear = ''
+      studentSignin.sclassname = ''
       alert('您的账号为：'+'[-->'+res.data.object.sid+'<--]--使用账号+密码登录')
+      dialogVisible.value = false
     }else if(res.data.msg === "error"){
       ElMessage.error('未知错误，请联系管理员');
     }
@@ -202,6 +214,7 @@ const ontSignIn = () =>{
       teacherSignin.tname = ''
       teacherSignin.tpassword = ''
       alert('您的账号为：'+'[-->'+res.data.object.tid+'<--]--使用账号+密码登录')
+      dialogVisible.value = false
     }else if(res.data.msg === "error"){
       ElMessage.error('未知错误，请联系管理员');
     }
@@ -264,7 +277,7 @@ const ontSignIn = () =>{
       请选择您要注册的用户类型
       <el-select v-model="userType" class="m-2" placeholder="请选择您要注册的用户类型">
         <el-option
-            v-for="item in options"
+            v-for="item in Toptions"
             :key="item.value"
             :label="item.label"
             :value="item.value"
@@ -281,11 +294,14 @@ const ontSignIn = () =>{
         </el-form-item>
         <el-form-item prop="sclass">
           班级
-          <el-input v-model="studentSignin.sclass" placeholder="请输入您的班级"  class="un" />
-        </el-form-item>
-        <el-form-item prop="syear">
-          年级
-          <el-input v-model="studentSignin.syear" placeholder="请输入您的年级" class="up" />
+          <el-select v-model="studentSigninclassData" class="m-2 un" placeholder="请选择您的班级" size="large">
+            <el-option
+                v-for="item in options"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item>
           <el-button class="sub" type="primary" @click="onsSignIn()">注册</el-button>
@@ -383,9 +399,8 @@ const ontSignIn = () =>{
   margin-left: 20%;
 }
 .Login-img{
-  width: 100%;
+  width: 80%;
+  margin-left: 10%;
 }
-.signIn{
-  margin-top: 5%;
-}
+
 </style>
