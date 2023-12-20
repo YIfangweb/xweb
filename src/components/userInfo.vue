@@ -4,7 +4,7 @@ import usestudentStore from "../stores/usestudentStore.js";
 import useteacherStore from "../stores/useteacherStore.js";
 import useUserType from "../stores/useUserType.js";
 import router from "../router/index.js";
-import {onMounted, reactive, ref} from "vue";
+import { reactive, ref} from "vue";
 import studentTopic from "./studentTopic.vue";
 import studentPaper from "./studentPaper.vue";
 import studentInfo from "./studentInfo.vue";
