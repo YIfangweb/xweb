@@ -1,6 +1,10 @@
 <script setup>
-import {ref, onMounted, getCurrentInstance, reactive} from 'vue'
-
+import {ref, onMounted, getCurrentInstance, reactive, provide} from 'vue'
+import usestudentStore from "../stores/usestudentStore.js";
+import paper  from '../components/paper.vue'
+import usepaperId from "../stores/usepaperId.js";
+import nothing from "./nothing.vue";
+import { UploadFilled } from '@element-plus/icons-vue'
 
 const currentInstance = getCurrentInstance();
 const { $http } = currentInstance.appContext.config.globalProperties;
@@ -46,6 +50,7 @@ const submitPaper = () => {
         type: 'warning'
     }).then(() => {
         let pram = new URLSearchParams();
+        pram.append("sunique", usestudentStore().studentMsg.sunique);
         pram.append("ptitle", paperMsg.ptitle);
         pram.append("pdata", paperMsg.pdata);
         proxy.$http.post("/api/submitPaper", pram).then((res) => {
@@ -55,6 +60,7 @@ const submitPaper = () => {
                     message: '提交成功！',
                     type: 'success',
                 })
+                location.reload()
                 writePaper.value = false
             } else {
                 ElMessage.error('提交失败');
@@ -92,6 +98,7 @@ const uploaddrawerClose = () => {
 //给交论文按钮绑定事件
 const upPaper = () => {
   uploadPaper.value = true
+
 }
 //论文列表数据
 const paperList = reactive([
@@ -108,15 +115,22 @@ const paperList = reactive([
 //onMounted函数
 onMounted(() => {
     //发送post请求获取论文列表数据
-  proxy.$http.get("/api/getPaperList").then((res) => {
+    let pram = new URLSearchParams();
+    pram.append("sunique", usestudentStore().studentMsg.sunique);
+  proxy.$http.get("/api/getPaperList?sunique="+usestudentStore().studentMsg.sunique).then((res) => {
     for (let i = 0; i < res.data.length; i++) {
-      paperList.value.push({
+      if (res.data[i].patatus === null) {
+        res.data[i].patatus = '未批改'
+      } else {
+        res.data[i].patatus = '已批改'
+      }
+      paperList.push({
         id: res.data[i].pid,
         title: res.data[i].ptitle,
-        author: res.data[i].sname,
-        teacher: res.data[i].tname,
+        author: res.data[i].pauthor,
+        teacher: res.data[i].pteacher,
         grade: res.data[i].pgrade,
-        status: res.data[i].pstatus
+        status: res.data[i].patatus
       })
     }
     //清除第一条数据
@@ -131,23 +145,25 @@ const singleTableRef = ref()
 const getCurrent = (row) => {
   singleTableRef.value.setCurrentRow(row)
 }
-const handleCurrentChange = (val) => {
-  currentRow.value = val
-}
 
+const openPaper = ref(false)
+const currentComponent  = {
+  1:paper,
+  2:nothing
+}
+const currentComponentName = ref(0)
 //打开按钮
-const handleOpen = () => {
-  console.log(currentRow)
+const handleOpen = (row, event, column) => {
+  usepaperId().paperId = row.id
+  openPaper.value = true
+  currentComponentName.value = 1
 }
-//编辑按钮
-const handleEdit = () => {
-  console.log(currentRow)
+const paperClose = () => {
+  usepaperId().$reset()
+  currentComponentName.value = 0
+  openPaper.value = false
+  location.reload()
 }
-//删除按钮
-const handleDelete = () => {
-  console.log(currentRow)
-}
-
 
 </script>
 <template>
@@ -167,7 +183,7 @@ const handleDelete = () => {
           <el-table
               :data="paperList"
               ref="singleTableRef"
-              @current-change="handleCurrentChange"
+              @row-dblclick="handleOpen"
               highlight-current-row
               style="width: calc(100% - 10px);"
               height="500"
@@ -204,15 +220,6 @@ const handleDelete = () => {
                   label="状态"
                   width="180">
               </el-table-column>
-              <el-table-column
-                  prop="action"
-                  label="操作"
-                  fixed="right"
-                  width="250">
-                <el-button type="primary"  @click="handleOpen()">打开</el-button>
-                <el-button type="primary"  @click="handleEdit()">编辑</el-button>
-                <el-button type="danger"  @click="handleDelete()">删除</el-button>
-              </el-table-column>
           </el-table>
         <el-drawer v-model="writePaper"
                    :before-close="drawerClose"
@@ -240,20 +247,22 @@ const handleDelete = () => {
             <el-form-item label="论文题目">
               <el-input v-model="uploadpaperMsg.ptitle" placeholder="请输入论文题目"></el-input>
             </el-form-item>
-            <el-form-item label="文件">
-              <el-upload
-                  class="upload-demo"
-                  drag
-                  accept="docx">
-                <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-                <div class="el-upload__tip" slot="tip">只能上传docx文件</div>
-              </el-upload>
+            <el-form-item>
+
             </el-form-item>
             <el-form-item>
               <el-button type="primary" @click="upPaper()">上传</el-button>
             </el-form-item>
           </el-form>
         </el-drawer>
+        <el-drawer v-model="openPaper"
+                   title="我的论文"
+                   size="80%"
+                   direction="ltr"
+                   :with-header="true"
+                   :before-close="paperClose">
+            <component :is="currentComponent[currentComponentName]"></component>
+          </el-drawer>
       </div>
   </div>
 </template>
