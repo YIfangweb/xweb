@@ -72,8 +72,8 @@ const ScomList = {
 const TcomList = {
   1 : teacherPaper,
   2 : teacherTopic,
-  3 : teacherClass,
-  4 : teacherInfo
+  4 : teacherClass,
+  3 : teacherInfo
 }
 
 const menuHeight = reactive({data : "0px"})
@@ -139,6 +139,11 @@ const changeSrc = (index)=>{
     </el-menu>
   </div>
   <div class="Teachermenu" v-if="getUsertype ==='教师'">
+    <div class="welcome">
+      <img src="../assets//logo.png" class="logoPng" alt="">
+      <h1 class="welcomeText">Hello</h1>
+      <h2 class="userName">{{useteacherStore().teacherMsg.tname}}</h2>
+    </div>
     <el-menu default-active="1" class="el-menu-vertical-demo" @select="handleSelect">
       <el-menu-item index="1"><img :src="paper.value" width="20" alt="" class="myimg">我的论文</el-menu-item>
       <el-menu-item index="2"><img :src="topic.value" width="20" alt="" class="myimg">我的课题</el-menu-item>

@@ -12,6 +12,10 @@ const studentMsg = reactive({
   sunique:''
 })
 
+/**
+ * 页面加载时将studentMsg中的数据绑定到usestudentStore中的studentMsg上
+ */
+
 onMounted(()=>{
   studentMsg.sname = usestudentStore().studentMsg.sname
   studentMsg.spassword = usestudentStore().studentMsg.spassword

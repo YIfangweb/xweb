@@ -106,7 +106,10 @@ const search = () => {
   param.append("searchData", searchValue.value);
   proxy.$http.post('/api/searchPaper', param).then(res => {
     if (res.data.length === 0) {
-      ElMessage.error('没有找到相关论文');
+      ElMessage.error({
+        message: '没有找到相关论文',
+        showClose: true
+      });
       return
     } else {
       //清空paperList
