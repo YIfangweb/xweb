@@ -1,123 +1,142 @@
 <script setup>
-import {ref, onMounted, getCurrentInstance, reactive, provide} from 'vue'
+import { ref, onMounted, getCurrentInstance, reactive } from 'vue'
 import usestudentStore from "../stores/usestudentStore.js";
-import paper  from '../components/paper.vue'
+import paper from '../components/paper.vue'
 import usepaperId from "../stores/usepaperId.js";
 import nothing from "./nothing.vue";
-import { UploadFilled } from '@element-plus/icons-vue'
 
 const currentInstance = getCurrentInstance();
 const { $http } = currentInstance.appContext.config.globalProperties;
 const { proxy } = currentInstance;
 
-const searchValue = ref('')
-const search = () => {
-    console.log(searchValue.value)
-}
 const writePaper = ref(false)
 
 //给写论文按钮绑定事件
 const addPaper = () => {
-    writePaper.value = true
+  writePaper.value = true
 }
 const drawerClose = () => {
-    //提示用户是否确认关闭
-    ElMessageBox.confirm('确认关闭吗？您的内容将会保存，不会清除', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-    }).then(() => {
-        writePaper.value = false
-    }).catch(() => {
-        ElMessage({
-            type: 'info',
-            message: '已取消关闭'
-        });
+  //提示用户是否确认关闭
+  ElMessageBox.confirm('确认关闭吗？您的内容将会保存，不会清除', '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  }).then(() => {
+    writePaper.value = false
+  }).catch(() => {
+    ElMessage({
+      type: 'info',
+      message: '已取消关闭'
     });
+  });
 }
 
 //论文信息
 const paperMsg = reactive({
-    ptitle: '',
-    pdata: ''
+  ptitle: '',
+  pdata: ''
 })
 
 //upPaper函数，先弹出确认框，用户点击确认后将论文信息传给后端，后端返回1为交论文成功，返回0交论文失败，弹出信息提示用户并关闭弹出框
 const submitPaper = () => {
-    ElMessageBox.confirm('确认提交吗？', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-    }).then(() => {
-        let pram = new URLSearchParams();
-        pram.append("sunique", usestudentStore().studentMsg.sunique);
-        pram.append("ptitle", paperMsg.ptitle);
-        pram.append("pdata", paperMsg.pdata);
-        proxy.$http.post("/api/submitPaper", pram).then((res) => {
-            console.log(res.data)
-            if (res.data === 1) {
-                ElMessage({
-                    message: '提交成功！',
-                    type: 'success',
-                })
-                location.reload()
-                writePaper.value = false
-            } else {
-                ElMessage.error('提交失败');
-            }
-        })
-    }).catch(() => {
+  ElMessageBox.confirm('确认提交吗？', '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  }).then(() => {
+    let pram = new URLSearchParams();
+    pram.append("sunique", usestudentStore().studentMsg.sunique);
+    pram.append("ptitle", paperMsg.ptitle);
+    pram.append("pdata", paperMsg.pdata);
+    proxy.$http.post("/api/submitPaper", pram).then((res) => {
+      console.log(res.data)
+      if (res.data === 1) {
         ElMessage({
-            type: 'info',
-            message: '已取消提交'
-        });
+          message: '提交成功！',
+          type: 'success',
+        })
+        location.reload()
+        writePaper.value = false
+      } else {
+        ElMessage.error('提交失败');
+      }
+    })
+  }).catch(() => {
+    ElMessage({
+      type: 'info',
+      message: '已取消提交'
     });
+  });
 }
 
 const uploadPaper = ref(false)
 
-const uploadpaperMsg = reactive({
-    ptitle: ''
-})
 
 const uploaddrawerClose = () => {
-    //提示用户是否确认关闭
-    ElMessageBox.confirm('确认关闭吗？文件将会保存，不会清除', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-    }).then(() => {
-        uploadPaper.value = false
-    }).catch(() => {
-        ElMessage({
-            type: 'info',
-            message: '已取消关闭'
-        });
+  //提示用户是否确认关闭
+  ElMessageBox.confirm('确认关闭吗？文件将会保存，不会清除', '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  }).then(() => {
+    uploadPaper.value = false
+  }).catch(() => {
+    ElMessage({
+      type: 'info',
+      message: '已取消关闭'
     });
-}
-//给交论文按钮绑定事件
-const upPaper = () => {
-  uploadPaper.value = true
-
+  });
 }
 //论文列表数据
 const paperList = reactive([
-    {
-        id: '',
-        title: '',
-        author: '',
-        teacher: '',
-        grade: '',
-        status: ''
-    }
+  {
+    id: '',
+    title: '',
+    author: '',
+    teacher: '',
+    grade: '',
+    status: ''
+  }
 ])
+
+const searchValue = ref('')
+const search = () => {
+  let param = new URLSearchParams();
+  param.append("unique", usestudentStore().studentMsg.sunique);
+  param.append("searchData", searchValue.value);
+  proxy.$http.post('/api/searchPaper', param).then(res => {
+    if (res.data.length === 0) {
+      ElMessage.error('没有找到相关论文');
+      return
+    } else {
+      //清空paperList
+      paperList.splice(0, paperList.length)
+      //papaerList放入请求数据
+      for (let i = 0; i < res.data.length; i++) {
+        if (res.data[i].patatus === null) {
+          res.data[i].patatus = '未批改'
+        } else {
+          res.data[i].patatus = '已批改'
+        }
+        paperList.push({
+          id: res.data[i].pid,
+          title: res.data[i].ptitle,
+          author: res.data[i].pauthor,
+          teacher: res.data[i].pteacher,
+          grade: res.data[i].pgrade,
+          status: res.data[i].patatus
+        })
+      }
+    }
+  })
+}
 
 //onMounted函数
 onMounted(() => {
-    //发送post请求获取论文列表数据
-    let pram = new URLSearchParams();
-    pram.append("sunique", usestudentStore().studentMsg.sunique);
-  proxy.$http.get("/api/getPaperList?sunique="+usestudentStore().studentMsg.sunique).then((res) => {
+  //发送post请求获取论文列表数据
+  let pram = new URLSearchParams();
+  pram.append("sunique", usestudentStore().studentMsg.sunique);
+  proxy.$http.get("/api/getPaperList?sunique=" + usestudentStore().studentMsg.sunique).then((res) => {
     for (let i = 0; i < res.data.length; i++) {
       if (res.data[i].patatus === null) {
         res.data[i].patatus = '未批改'
@@ -137,7 +156,9 @@ onMounted(() => {
     paperList.shift()
   })
 })
-
+const reloadPaper = () => {
+    location.reload()
+}
 
 const currentRow = ref()
 const singleTableRef = ref()
@@ -147,9 +168,9 @@ const getCurrent = (row) => {
 }
 
 const openPaper = ref(false)
-const currentComponent  = {
-  1:paper,
-  2:nothing
+const currentComponent = {
+  1: paper,
+  2: nothing
 }
 const currentComponentName = ref(0)
 //打开按钮
@@ -165,144 +186,133 @@ const paperClose = () => {
   location.reload()
 }
 
+const handleClick = (row) => {
+  ElMessageBox.confirm('确认删除吗？', '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  }).then(() => {
+    let pram = new URLSearchParams();
+    pram.append("pid", row.id);
+    pram.append("sunique", usestudentStore().studentMsg.sunique);
+    proxy.$http.post("/api/deletePaper", pram).then((res) => {
+      if (res.data === 1) {
+        ElMessage({
+          message: '删除成功！',
+          type:'success',
+        })
+        location.reload()
+      } else {
+        ElMessage.error('删除失败');
+      }
+    })
+  }).catch(() => {
+    ElMessage({
+      type: 'info',
+      message: '已取消删除'
+      });
+  });
+}
+
 </script>
 <template>
   <div class="headerDiv">
-      <div class="searchDiv">
-            <el-input
-                class="searchInput"
-                v-model="searchValue"
-                placeholder="请输入论文题目"
-                clearable
-            />
-            <el-button type="primary" @click="search"><img src="../assets/search.svg" width="20" alt="">搜索</el-button>
-            <el-button type="primary" class="addPaper" @click="addPaper"><img src="../assets/add.svg" width="20" alt="">写论文</el-button>
-            <el-button type="primary" @click="upPaper"><img src="../assets/add.svg" width="20" alt="">交论文</el-button>
-      </div>
-      <div class="paperList">
-          <el-table
-              :data="paperList"
-              ref="singleTableRef"
-              @row-dblclick="handleOpen"
-              highlight-current-row
-              style="width: calc(100% - 10px);"
-              height="500"
-              border
-              stripe
-              class="paperListTable">
-            <el-table-column
-                prop="id"
-                label="论文编号"
-                width="90">
-            </el-table-column>
-              <el-table-column
-                  prop="title"
-                  label="论文题目"
-                  width="300">
-              </el-table-column>
-              <el-table-column
-                  prop="author"
-                  label="作者"
-                  width="180">
-              </el-table-column>
-              <el-table-column
-                  prop="teacher"
-                  label="指导老师"
-                  width="180">
-              </el-table-column>
-              <el-table-column
-                  prop="grade"
-                  label="成绩"
-                  width="180">
-              </el-table-column>
-              <el-table-column
-                  prop="status"
-                  label="状态"
-                  width="180">
-              </el-table-column>
-          </el-table>
-        <el-drawer v-model="writePaper"
-                   :before-close="drawerClose"
-                   title="写论文"
-                    size="50%"
-                   :with-header="true">
-          <el-form :model="paperMsg" label-width="100" class="fromStyle">
-              <el-form-item label="论文题目">
-                  <el-input v-model="paperMsg.ptitle" placeholder="请输入论文题目"></el-input>
-              </el-form-item>
-              <el-form-item label="论文内容">
-                  <el-input v-model="paperMsg.pdata" type="textarea" :autosize="{ minRows: 20, maxRows: 50}" placeholder="请输入论文内容"></el-input>
-              </el-form-item>
-              <el-form-item>
-                  <el-button type="primary" @click="submitPaper()">提交</el-button>
-              </el-form-item>
-          </el-form>
-        </el-drawer>
-        <el-drawer v-model="uploadPaper"
-                   :before-close="uploaddrawerClose"
-                   title="交论文"
-                   size="50%"
-                   :with-header="true">
-          <el-form :model="uploadpaperMsg" label-width="100" class="fromStyle">
-            <el-form-item label="论文题目">
-              <el-input v-model="uploadpaperMsg.ptitle" placeholder="请输入论文题目"></el-input>
-            </el-form-item>
-            <el-form-item>
-
-            </el-form-item>
-            <el-form-item>
-              <el-button type="primary" @click="upPaper()">上传</el-button>
-            </el-form-item>
-          </el-form>
-        </el-drawer>
-        <el-drawer v-model="openPaper"
-                   title="我的论文"
-                   size="80%"
-                   direction="ltr"
-                   :with-header="true"
-                   :before-close="paperClose">
-            <component :is="currentComponent[currentComponentName]"></component>
-          </el-drawer>
-      </div>
+    <div class="searchDiv">
+      <el-input class="searchInput" v-model="searchValue" placeholder="请输入论文题目" clearable  @clear="reloadPaper" />
+      <el-button type="primary" @click="search"><img src="../assets/search.svg" width="20" alt="">搜索</el-button>
+      <el-button type="primary" class="addPaper" @click="addPaper"><img src="../assets/add.svg" width="20"
+          alt="">写论文</el-button>
+    </div>
+    <div class="paperList">
+      <el-table :data="paperList" ref="singleTableRef" @row-dblclick="handleOpen" highlight-current-row
+        style="width: calc(100% - 10px);" height="500" border stripe class="paperListTable">
+        <el-table-column prop="id" label="论文编号" width="90">
+        </el-table-column>
+        <el-table-column prop="title" label="论文题目" width="300">
+        </el-table-column>
+        <el-table-column prop="author" label="作者" width="180">
+        </el-table-column>
+        <el-table-column prop="teacher" label="指导老师" width="180">
+        </el-table-column>
+        <el-table-column prop="grade" label="成绩" width="180">
+        </el-table-column>
+        <el-table-column prop="status" label="状态" width="180">
+        </el-table-column>
+        <el-table-column label="操作" width="100" fixed="right" #default="scope">
+            <el-button type="primary" @click="handleClick(scope.row)">删除</el-button>
+        </el-table-column>
+      </el-table>
+      <el-drawer v-model="writePaper" :before-close="drawerClose" title="写论文" size="50%" :with-header="true">
+        <el-form :model="paperMsg" label-width="100" class="fromStyle">
+          <el-form-item label="论文题目">
+            <el-input v-model="paperMsg.ptitle" placeholder="请输入论文题目"></el-input>
+          </el-form-item>
+          <el-form-item label="论文内容">
+            <el-input v-model="paperMsg.pdata" type="textarea" :autosize="{ minRows: 20, maxRows: 50 }"
+              placeholder="请输入论文内容"></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click="submitPaper()">提交</el-button>
+          </el-form-item>
+        </el-form>
+      </el-drawer>
+      <el-drawer v-model="openPaper" title="我的论文" size="80%" direction="ltr" :with-header="true"
+        :before-close="paperClose">
+        <component :is="currentComponent[currentComponentName]"></component>
+      </el-drawer>
+    </div>
   </div>
 </template>
 <style scoped>
 .headerDiv {
-    display: inline-block;
-    align-items: center;
-    background-color: #f5f5f5;
-    width: 87%;
+  display: inline-block;
+  align-items: center;
+  background-color: #f5f5f5;
+  width: 87%;
 }
+
 .searchDiv {
-    display: flex;
-    align-items: center;
-    height: 100px;
-    margin-left: 5px;
-    width: 100%;
-    background-color: #fff;
-    border-radius: 5px;
-    border: 0.5px solid #ebebeb;
+  display: flex;
+  align-items: center;
+  height: 100px;
+  margin-left: 5px;
+  width: 100%;
+  background-color: #fff;
+  border-radius: 5px;
+  border: 0.5px solid #ebebeb;
 }
+
 .searchInput {
-    width: 340px;
-    margin-left: 15%;
+  width: 340px;
+  margin-left: 15%;
 }
-.addPaper{
-    margin-left: 25%;
+
+.addPaper {
+  margin-left: 25%;
 }
+
 .paperList {
-    margin-left: 5px;
-    width: 100%;
-    background-color: #fff;
-    border-radius: 5px;
-    border: 0.5px solid #ebebeb;
-    height: 600px;
+  margin-left: 5px;
+  width: 100%;
+  background-color: #fff;
+  border-radius: 5px;
+  border: 0.5px solid #ebebeb;
+  height: 600px;
 }
+
 .paperListTable {
-    margin-top: 10px;
-    margin-left: 5px;
+  margin-top: 10px;
+  margin-left: 5px;
 }
-.fromStyle{
-    width: 100%;
+
+.fromStyle {
+  width: 100%;
+}
+
+.selectFile {
+  width: 170px;
+  height: 170px;
+  border-radius: 5px;
+  border: 2px dashed #ebebeb;
 }
 </style>
