@@ -138,8 +138,8 @@ const search = () => {
 onMounted(() => {
   //发送post请求获取论文列表数据
   let pram = new URLSearchParams();
-  pram.append("sunique", usestudentStore().studentMsg.sunique);
-  proxy.$http.get("/api/getPaperList?sunique=" + usestudentStore().studentMsg.sunique).then((res) => {
+  pram.append("unique", usestudentStore().studentMsg.sunique);
+  proxy.$http.get("/api/getPaperList?unique=" + usestudentStore().studentMsg.sunique).then((res) => {
     for (let i = 0; i < res.data.length; i++) {
       if (res.data[i].patatus === null) {
         res.data[i].patatus = '未批改'
@@ -289,11 +289,6 @@ const handleClick = (row) => {
   width: 340px;
   margin-left: 15%;
 }
-
-.addPaper {
-  margin-left: 25%;
-}
-
 .paperList {
   margin-left: 5px;
   width: 100%;

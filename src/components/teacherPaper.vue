@@ -264,11 +264,6 @@ const handleClick = (row) => {
   width: 340px;
   margin-left: 15%;
 }
-
-.addPaper {
-  margin-left: 25%;
-}
-
 .paperList {
   margin-left: 5px;
   width: 100%;
