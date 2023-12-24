@@ -306,11 +306,4 @@ const handleClick = (row) => {
 .fromStyle {
   width: 100%;
 }
-
-.selectFile {
-  width: 170px;
-  height: 170px;
-  border-radius: 5px;
-  border: 2px dashed #ebebeb;
-}
 </style>

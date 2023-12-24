@@ -47,8 +47,23 @@ const toLogin=()=>{
             {{ userName }}
         </div>
     </div>
+    <div class="bodys">
+        <div class="searcher">
+            <el-input v-model="search" placeholder="请输入关键字"></el-input>
+            <el-button @click="searchPaper" type="primary">查询</el-button>
+        </div>
+    </div>
 </template>
 <style>
+.searcher{
+    width: 80%;
+    height: 80px;
+    margin-top: 10px;
+}
+.bodys{
+    width: 80%;
+    margin-left: 10%;
+}
 .header {
     margin-top: 1%;
     height: 60px;
