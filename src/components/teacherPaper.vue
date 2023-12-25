@@ -243,10 +243,8 @@ const handleClick = (row) => {
 </template>
 <style scoped>
 .headerDiv {
-  display: inline-block;
-  align-items: center;
-  background-color: #f5f5f5;
   width: 87%;
+  margin-left: 12%;
 }
 
 .searchDiv {

@@ -51,7 +51,7 @@ const onslogin = async () => {
             const store = usestudentStore();
             store.studentMsg = res.data.object
             userTypeStore.userType = '学生'
-            router.push('/')
+            router.push('/userInfo')
         } else {
             ElMessage.error('账号或密码错误');
             user.upassword= '';
@@ -77,7 +77,7 @@ const ontlogin = async () => {
       const store = useteacherStore();
       store.teacherMsg = res.data.object
       userTypeStore.userType = '教师'
-      router.push('/')
+      router.push('/userInfo')
     } else {
       ElMessage.error('账号或密码错误');
       tuser.tupassword= '';

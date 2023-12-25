@@ -77,9 +77,6 @@ const ctrls = () => {
     <el-form-item label="分数" >
       <el-input v-model="paperMsg.pgrade" disabled></el-input>
     </el-form-item>
-    <el-form-item label="状态">
-      <el-input v-model="paperMsg.pstatus" disabled></el-input>
-    </el-form-item>
     <el-form-item label="论文内容">
       <el-input v-model="paperMsg.pdata" type="textarea" :autosize="{ minRows: 10, maxRows: 50}" placeholder="请输入论文内容"></el-input>
     </el-form-item>

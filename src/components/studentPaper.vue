@@ -141,7 +141,7 @@ onMounted(() => {
   pram.append("unique", usestudentStore().studentMsg.sunique);
   proxy.$http.get("/api/getPaperList?unique=" + usestudentStore().studentMsg.sunique).then((res) => {
     for (let i = 0; i < res.data.length; i++) {
-      if (res.data[i].patatus === null) {
+      if (res.data[i].pgrade === null) {
         res.data[i].patatus = '未批改'
       } else {
         res.data[i].patatus = '已批改'

@@ -9,7 +9,6 @@ const currentInstance = getCurrentInstance();
 const { $http } = currentInstance.appContext.config.globalProperties;
 const { proxy } = currentInstance;
 
-const pageKey = ref(1)
 
 const searchValue = ref('')
 
@@ -148,7 +147,7 @@ const handleClick = (row) => {
 
 </script>
 <template>
-  <div class="head" v-if="pageKey >= 1">
+  <div class="head">
     <div class="searchDiv">
       <el-input class="searchInput" v-model="searchValue" placeholder="请输入课题名称" clearable @clear="reloadTopic" />
       <el-button type="primary" @click="search"><img src="../assets/search.svg" width="20" alt="">搜索</el-button>
